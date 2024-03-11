@@ -2,13 +2,13 @@ import Queue from './queue.js';
 /*
  * - Don't bother making an adjacency list/matrix, just traverse the board
  *   using the vector change possible for a knight for x and y
- * - Do a breadth first search from the starting positition
- * - Keep a `visited` array initialised for false with the same shape as the
- *   board
- * - Keep a `prev` array with same shape as the board and fill with the coord
- *   of the parent for each visited position so we can walk back to the start
+ * - Do a breadth first search from the starting position
+ * - Keep a `visited` array initialised for false with same shape as board
+ * - Keep a `prev` array with same shape as board and fill with the coords
+ *   of parent for each visited position so we can walk back to the start
  * - Queue the coords for the neighbours based on the possible eight vectors
  *   for the knight, excluding those outside the bounds or visited
+ * - Backtrack each parent in the `prev` array to build the path to start
  */
 
 function outOfBounds(arr) {
@@ -68,17 +68,13 @@ function findShortest(start, end) {
             break;
         }
 
-        // Add neighbours to the queue by iterating possible vectors
+        // Find neighbours by iterating possible vectors
         for (let i = 0; i < dx.length; i++) {
             const nx = x + dx[i];
             const ny = y + dy[i];
 
-            // if any fall out of bounds or are already visited skip;
-            if (outOfBounds([nx, ny])) {
-                continue;
-            }
-
-            if (seen[ny][nx]) {
+            // If neighbour out of bounds or already seen skip
+            if (outOfBounds([nx, ny]) || seen[ny][nx]) {
                 continue;
             }
 
@@ -87,6 +83,7 @@ function findShortest(start, end) {
             seen[ny][nx] = true;
             prev[ny][nx] = [x, y];
 
+            // Add this neighbour to the queue
             qx.enqueue(nx);
             qy.enqueue(ny);
         }
